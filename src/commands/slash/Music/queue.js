@@ -4,7 +4,7 @@ const ExtendedClient = require('../../../class/ExtendedClient');
 module.exports = {
     structure: new SlashCommandBuilder()
         .setName('queue')
-        .setDescription('Show or clear the queue.')
+        .setDescription('Manage the music player queue.')
         .addStringOption(option =>
             option.setName('action')
                 .setDescription('Choose an action')
@@ -57,7 +57,10 @@ module.exports = {
                 }
 
                 case 'clear': {
-                    player.stop(interaction.guildId);
+                    const queue = player.getQueue(interaction.guildId);
+
+                    queue.remove(interaction.guildId);
+
                     interaction.reply({
                         embeds: [
                             new EmbedBuilder()
