@@ -53,7 +53,7 @@ module.exports = {
                     const queue = player.getQueue(interaction.guildId);
                     if (!queue || !queue.songs.length) return interaction.reply({ content: 'The queue is empty.' });
                     
-                    if (queue._next === false) return interaction.reply({
+                    if (queue._next == false) return interaction.reply({
                         embeds: [
                             new EmbedBuilder()
                                 .setTitle(`Currently Playing`)
@@ -84,7 +84,7 @@ module.exports = {
                     const queue = player.getQueue(interaction.guildId);
                     if (!queue || !queue.songs.length) return interaction.reply({ content: 'The queue is empty.' });
                     
-                    if (queue._prev === false) return interaction.reply({
+                    if (queue._prev == false) return interaction.reply({
                         embeds: [
                             new EmbedBuilder()
                                 .setTitle(`Currently Playing`)
