@@ -5,12 +5,8 @@ const GuildSchema = require('../../../schemas/GuildSchema');
 
 module.exports = {
     structure: new SlashCommandBuilder()
-        .setName('setlogschannel')
-        .setDescription('Sets logs channel.')
-        .addChannelOption(option =>
-            option.setName('channel')
-                .setDescription('Log channel')
-                .setRequired(true)),
+        .setName('unsetlogschannel')
+        .setDescription('Unsets logs channel.'),
     /**
      * @param {ExtendedClient} client 
      * @param {ChatInputCommandInteraction} interaction 
@@ -19,33 +15,21 @@ module.exports = {
     run: async (client, interaction, args) => {
 
         if (interaction.member.permissions.has(PermissionFlagsBits.ManageChannels)) {
-            const channel = interaction.options.get('channel').value;
-
             await interaction.deferReply()
 
-            if (!channel) {
-                interaction.editReply({
-                    content: 'Please select a valid channel.'
-                })
-            }
-
             try {
-                let data = await GuildSchema.findOne({ guild: interaction.guildId });
-
-                if (!data) data = new GuildSchema({
+                await GuildSchema.findOne({
                     guild: interaction.guildId
-                });
-
-                data.logChannel = channel;
-
-                data.save();
+                }).updateOne({
+                    logChannel: 'none'
+                })
 
                 await interaction.editReply({
                     embeds: [
                         new EmbedBuilder()
                             .setTitle('Success!')
-                            .setDescription(`log channel has been set to <#${channel}>.`)
-                            .setFooter({ text: 'Set log channel' })
+                            .setDescription(`log channel has been unset.`)
+                            .setFooter({ text: 'Unset log channel' })
                             .setTimestamp()
                             .setColor('White')
                     ]

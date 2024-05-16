@@ -78,7 +78,7 @@ client.on('messageDelete', async (message) => {
     if (message.author.bot) return;
 
     if (message.content || message.attachments.size > 0) {
-        if (message.author.id === '821681414947733504' && message.content.startsWith('lunaria.')) return;
+        if (message.author.id === '821681414947733504' && message.content.startsWith('loona.')) return;
 
         const embed = new EmbedBuilder()
             .setTitle('Message deleted')
@@ -97,7 +97,7 @@ client.on('messageDelete', async (message) => {
         }
 
         if (message.attachments.size > 0) {
-            if (message.author.id === '821681414947733504' && message.content.startsWith('lunaria.')) return;
+            if (message.author.id === '821681414947733504' && message.content.startsWith('loona.')) return;
 
             const attachment = message.attachments.map(attachment => attachment.url)
             embed.addFields(
