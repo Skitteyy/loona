@@ -11,7 +11,7 @@ module.exports = {
                 .addChoices(
                     { name: 'show', value: 'show' },
                     { name: 'next', value: 'next' },
-                    { name: 'previous', value: 'previous'}
+                    { name: 'previous', value: 'previous' }
                 )
                 .setRequired(true)),
     /**
@@ -23,19 +23,20 @@ module.exports = {
         const player = client.distube;
 
         try {
+            const queue = player.getQueue(interaction.guildId);
+
+            const storage = queue.previousSongs.map(song => song.url)
+
             if (!interaction.member.voice.channel) {
                 interaction.reply({
                     content: 'You are not in a voice channel.'
                 });
                 return;
             }
-            
+
             switch (interaction.options.getString('action')) {
                 case 'show': {
-                    const queue = player.getQueue(interaction.guildId);
-                    if (!queue || !queue.songs.length) return interaction.reply({ content: 'The queue is empty.' });
-
-                    interaction.reply({
+                    await interaction.reply({
                         embeds: [
                             new EmbedBuilder()
                                 .setTitle(`Currently Playing`)
@@ -50,66 +51,60 @@ module.exports = {
                 }
 
                 case 'next': {
-                    const queue = player.getQueue(interaction.guildId);
-                    if (!queue || !queue.songs.length) return interaction.reply({ content: 'The queue is empty.' });
-                    
-                    if (queue._next == false) return interaction.reply({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setTitle(`Currently Playing`)
-                                .setDescription(`No song to skip to in the queue.`)
-                                .setFooter({ text: 'Current song' })
-                                .setTimestamp()
-                                .setColor('White')
-                        ]
-                    });
-
-                    player.skip(interaction.guildId);
-
-                    interaction.reply({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setTitle(`Currently Playing`)
-                                .setDescription(`Skipped to next song **${(await queue.skip()).name}**`)
-                                .setFooter({ text: 'Current song' })
-                                .setTimestamp()
-                                .setColor('White')
-                        ]
-                    });
+                    if (!queue.songs[1]) {
+                        interaction.reply({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle(`Currently Playing`)
+                                    .setDescription('No song in queue to skip to.')
+                                    .setFooter({ text: 'Current song' })
+                                    .setTimestamp()
+                                    .setColor('White')
+                            ]
+                        })
+                    } else {
+                        await player.skip(interaction.guildId).then(interaction.reply({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle(`Currently Playing`)
+                                    .setDescription(`Skipped to next song **${queue.songs[1].name}**`)
+                                    .setFooter({ text: 'Current song' })
+                                    .setTimestamp()
+                                    .setColor('White')
+                            ]
+                        }));
+                    }
 
                     break;
                 }
 
                 case 'previous': {
-                    const queue = player.getQueue(interaction.guildId);
-                    if (!queue || !queue.songs.length) return interaction.reply({ content: 'The queue is empty.' });
-                    
-                    if (queue._prev == false) return interaction.reply({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setTitle(`Currently Playing`)
-                                .setDescription(`No song to return to in the queue.`)
-                                .setFooter({ text: 'Current song' })
-                                .setTimestamp()
-                                .setColor('White')
-                        ]
-                    });
-
-                    player.previous(interaction.guildId);
-                    
-                    interaction.reply({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setTitle(`Currently Playing`)
-                                .setDescription(`Skipped to previous song **${(await queue.previous()).name}**`)
-                                .setFooter({ text: 'Current song' })
-                                .setTimestamp()
-                                .setColor('White')
-                        ]
-                    });
+                    if (storage.length < 1) {
+                        interaction.reply({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle(`Currently Playing`)
+                                    .setDescription('No song in queue to return to.')
+                                    .setFooter({ text: 'Current song' })
+                                    .setTimestamp()
+                                    .setColor('White')
+                            ]
+                        })
+                    } else {
+                        await player.previous(interaction.guildId).then(interaction.reply({
+                            embeds: [
+                                new EmbedBuilder()
+                                    .setTitle(`Currently Playing`)
+                                    .setDescription(`Skipped to previous song **${(await queue.previous()).name}**`)
+                                    .setFooter({ text: 'Current song' })
+                                    .setTimestamp()
+                                    .setColor('White')
+                            ]
+                        }));
+                    }
 
                     break;
-                }                
+                }
             }
         } catch (error) {
             console.error(error);
