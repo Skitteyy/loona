@@ -2,7 +2,7 @@ const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, ActionRo
 const ExtendedClient = require('../../../class/ExtendedClient');
 const EconomySchema = require('../../../schemas/EconomySchema');
 
-const ITEMS_PER_PAGE = 5; // Adjust as needed
+const ITEMS_PER_PAGE = 5;
 
 module.exports = {
     structure: new SlashCommandBuilder()
@@ -24,7 +24,7 @@ module.exports = {
         if (!economy || !economy.items || economy.items.length === 0) {
             return interaction.reply({
                 content: "Your inventory is empty.",
-                components: [] // Remove components in this case
+                components: []
             });
         }
 
@@ -42,7 +42,6 @@ module.exports = {
                 .setDescription(`Page ${currentPage}/${totalPages}`)
                 .setColor('White');
 
-            // Add each item as a field
             itemsToDisplay.forEach((item, index) => {
                 embed.addFields({ name: `Item ${index + 1}`, value: item, inline: true });
             });
@@ -55,11 +54,11 @@ module.exports = {
                 new ButtonBuilder()
                     .setCustomId('prevPage')
                     .setLabel('Previous')
-                    .setStyle(1), // Use 1 for Primary
+                    .setStyle(1),
                 new ButtonBuilder()
                     .setCustomId('nextPage')
                     .setLabel('Next')
-                    .setStyle(1) // Use 1 for Primary
+                    .setStyle(1)
             );
 
         const updateMessage = await interaction.reply({
@@ -70,7 +69,7 @@ module.exports = {
 
         const collector = updateMessage.createMessageComponentCollector({
             componentType: ComponentType.Button,
-            time: 60000, // Set a reasonable time limit for interaction
+            time: 60000,
         });
 
         collector.on('collect', async (buttonInteraction) => {
@@ -93,10 +92,6 @@ module.exports = {
                     });
                 }
             }
-        });
-
-        collector.on('end', () => {
-            // Handle the collector ending (e.g., cleanup)
         });
     }
 };

@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ComponentType, MentionableSelectMenuBuilder, } = require('discord.js');
+const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ComponentType, ButtonBuilder } = require('discord.js');
 const ExtendedClient = require('../../../class/ExtendedClient');
 
 module.exports = {
@@ -40,18 +40,76 @@ module.exports = {
                     const queue = player.getQueue(interaction.guildId);
                     if (!queue || !queue.songs.length) return interaction.reply({ content: 'The queue is empty.' });
 
-                    const queueList = queue.songs.map((song, index) => `**${index + 1}.** ${song.name}`).join('\n');
+                    let currentPage = 0;
+                    const songsPerPage = 10;
+                    const totalPages = Math.ceil(queue.songs.length / songsPerPage);
 
-                    interaction.reply({
-                        embeds: [
-                            new EmbedBuilder()
-                                .setTitle(`${interaction.guild.name} Queue`)
-                                .setDescription(queueList)
-                                .setFooter({ text: 'Queue' })
-                                .setTimestamp()
-                                .setColor('White')
-                        ]
+                    const generateEmbed = (page) => {
+                        const start = page * songsPerPage;
+                        const end = start + songsPerPage;
+                        const currentSongs = queue.songs.slice(start, end);
+                        const queueList = currentSongs.map((song, index) => `**${start + index + 1}.** ${song.name}`).join('\n');
+
+                        return new EmbedBuilder()
+                            .setTitle(`${interaction.guild.name} Queue`)
+                            .setDescription(queueList)
+                            .setFooter({ text: `Page ${page + 1} of ${totalPages}` })
+                            .setTimestamp()
+                            .setColor('White');
+                    };
+
+                    const row = new ActionRowBuilder().addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('previous')
+                            .setLabel('Previous')
+                            .setStyle(1)
+                            .setDisabled(currentPage === 0),
+                        new ButtonBuilder()
+                            .setCustomId('next')
+                            .setLabel('Next')
+                            .setStyle(1)
+                            .setDisabled(currentPage === totalPages - 1)
+                    );
+
+                    await interaction.reply({
+                        embeds: [generateEmbed(currentPage)],
+                        components: [row]
                     });
+
+                    const filter = i => i.customId === 'previous' || i.customId === 'next';
+                    const collector = interaction.channel.createMessageComponentCollector({ filter, componentType: ComponentType.Button, time: 60000 });
+
+                    collector.on('collect', async i => {
+                        if (i.customId === 'previous') {
+                            currentPage--;
+                        } else if (i.customId === 'next') {
+                            currentPage++;
+                        }
+
+                        await i.update({
+                            embeds: [generateEmbed(currentPage)],
+                            components: [
+                                new ActionRowBuilder().addComponents(
+                                    new ButtonBuilder()
+                                        .setCustomId('previous')
+                                        .setLabel('Previous')
+                                        .setStyle(1)
+                                        .setDisabled(currentPage === 0),
+                                    new ButtonBuilder()
+                                        .setCustomId('next')
+                                        .setLabel('Next')
+                                        .setStyle(1)
+                                        .setDisabled(currentPage === totalPages - 1)
+                                )
+                            ]
+                        });
+                    });
+
+                    collector.on('end', () => {
+                        row.components[0].setDisabled(true);
+                        row.components[1].setDisabled(true);
+                        interaction.editReply({ components: [row] });
+                    })
 
                     break;
                 }

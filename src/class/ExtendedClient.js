@@ -30,8 +30,10 @@ module.exports = class extends Client {
                 Partials.Message
             ],
             presence: {
+                status: 'idle',
                 activities: [{
-                    name: '/economy'
+                    name: 'Observing the Moon',
+                    type: 'CUSTOM'
                 }]
             }
         });

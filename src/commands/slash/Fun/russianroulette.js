@@ -12,12 +12,12 @@ module.exports = {
      */
     run: async (client, interaction, args) => {
         const row = new ActionRowBuilder()
-        .setComponents(
-            new ButtonBuilder()
-                .setCustomId('russianroulette_button')
-                .setLabel('Pull trigger again')
-                .setStyle(ButtonStyle.Primary)
-        );
+            .setComponents(
+                new ButtonBuilder()
+                    .setCustomId('russianroulette_button')
+                    .setLabel('Pull trigger again')
+                    .setStyle(ButtonStyle.Primary)
+            );
 
         let options = [
             '*click* nothing happened',
@@ -38,10 +38,12 @@ module.exports = {
                     .setFooter({ text: 'Russian roulette' })
                     .setTimestamp()
             ],
-            components: [ row ]
+            components: [row]
         });
 
-        const collector = interaction.channel.createMessageComponentCollector();
+        const filter = i => i.customId === 'coinflip_button' && i.user.id === interaction.user.id;
+
+        const collector = interaction.channel.createMessageComponentCollector({ filter: filter, time: 30000 });
 
         collector.on('collect', async interaction => {
             if (interaction.customId === 'russianroulette_button') {
@@ -54,9 +56,14 @@ module.exports = {
                             .setFooter({ text: 'Russian roulette' })
                             .setTimestamp()
                     ],
-                    components: [ row ]
+                    components: [row]
                 });
             }
+        })
+
+        collector.on('end', () => {
+            row.components[0].setDisabled(true);
+            interaction.editReply({ components: [row] });
         })
     }
 };
