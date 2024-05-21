@@ -37,7 +37,9 @@ module.exports = {
             components: [ row ]
         });
 
-        const collector = interaction.channel.createMessageComponentCollector();
+        const filter = i => i.customId === 'coinflip_button' && i.user.id === interaction.user.id;
+
+        const collector = interaction.channel.createMessageComponentCollector({ filter: filter, time: 30000});
 
         collector.on('collect', async interaction => {
             if (interaction.customId === 'coinflip_button') {
@@ -53,6 +55,11 @@ module.exports = {
                     components: [ row ]
                 });
             }
+        })
+
+        collector.on('end', () => {
+                row.components[0].setDisabled(true);
+                interaction.editReply({ components: [row] });
         })
     }
 };

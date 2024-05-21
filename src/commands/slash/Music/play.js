@@ -24,7 +24,7 @@ module.exports = {
             await player.play(interaction.member.voice.channel, query);
     
             if (!interaction.member.voice.channel) {
-                await interaction.editReply({
+                await interaction.reply({
                     content: 'You are not in a voice channel.'
                 });
                 return;
