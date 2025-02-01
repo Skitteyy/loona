@@ -30,7 +30,7 @@ module.exports = {
 
         let economy = await EconomySchema.findOne({
             guild: interaction.guildId,
-            user: interaction.member.user.username
+            user: interaction.member.user.id
         })
 
         if (!economy) {
@@ -44,7 +44,7 @@ module.exports = {
 
         let weekly = await TimeSchema.findOne({
             guild: interaction.guildId,
-            user: interaction.user.username
+            user: interaction.user.id
         });
 
         switch (interaction.options.getString('action')) {
@@ -52,7 +52,7 @@ module.exports = {
                 if (!weekly) {
                     new TimeSchema({
                         guild: interaction.guildId,
-                        user: interaction.user.username,
+                        user: interaction.user.id,
                         lastWeekly: currentDate,
                         nextWeekly: nextWeeklyDate
                     }).save();
@@ -70,7 +70,7 @@ module.exports = {
 
                     await EconomySchema.find({
                         guild: interaction.guildId,
-                        user: interaction.user.username
+                        user: interaction.user.id
                     }).updateOne({
                         balance: balance + 25000
                     });
@@ -91,13 +91,13 @@ module.exports = {
 
                         await EconomySchema.find({
                             guild: interaction.guildId,
-                            user: interaction.user.username
+                            user: interaction.user.id
                         }).updateOne({
                             balance: balance + 25000
                         })
 
                         await TimeSchema.findOneAndUpdate(
-                            { guild: interaction.guildId, user: interaction.user.username },
+                            { guild: interaction.guildId, user: interaction.user.id },
                             { lastWeekly: currentDate, nextWeekly: nextWeeklyDate }
                         );
 

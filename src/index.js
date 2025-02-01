@@ -2,11 +2,13 @@ const { EmbedBuilder } = require('discord.js');
 const GuildSchema = require('./schemas/GuildSchema');
 const EconomySchema = require('./schemas/EconomySchema');
 
-var cooldown = [];
+var EcoCooldown = [];
+var XPCooldown = [];
 
 
 require('dotenv').config();
 const ExtendedClient = require('./class/ExtendedClient');
+const LevelsSchema = require('./schemas/LevelsSchema');
 
 const client = new ExtendedClient();
 
@@ -16,51 +18,131 @@ process.on('unhandledRejection', console.error);
 process.on('uncaughtException', console.error);
 
 client.on('messageCreate', async (message) => {
+    if (message.author.bot) return;
+
+    await handleEconomy(message);
+
+    await handleXP(message);
+
+    if (message.author.id === '821681414947733504') {
+        if (message.content.startsWith('loona.')) {
+            const messageContent = message.content.slice('loona.'.length);
+            message.delete();
+            message.channel.send(messageContent);
+            console.log(`Loona command triggered: ${messageContent}`);
+        }
+    }
+});
+
+async function handleEconomy(message) {
     let economy = await EconomySchema.findOne({
         guild: message.guildId,
-        user: message.author.username
+        user: message.author.id
     });
 
     const balance = await EconomySchema.findOne({
         guild: message.guildId,
-        user: message.author.username,
+        user: message.author.id,
         balance: {
             $exists: true
         }
     });
 
-    if (cooldown.includes(message.author.id)) return;
+    if (!economy || !balance) {
+        return;
+    }
 
-    if (!economy) return;
-
-    if (!balance) return;
+    if (EcoCooldown.includes(message.author.id)) return;
 
     const randomAmount = Math.floor(Math.random() * 10) + 1;
 
-    const updatedBalance = Math.floor(economy.balance + randomAmount);
+    const updatedBalance = economy.balance + randomAmount;
 
     await EconomySchema.find({
         guild: message.guildId,
-        user: message.author.username
+        user: message.author.id
     }).updateOne({
         balance: updatedBalance
-    })
+    });
 
-    cooldown.push(message.author.id);
+    EcoCooldown.push(message.author.id);
     setTimeout(() => {
-        cooldown.shift();
+        EcoCooldown.shift();
     }, 30 * 1000);
+}
 
-    if (message.author.id === '821681414947733504') {
-        if (message.content.startsWith('loona.')) {
-            const messageContent = message.content.slice('loona.'.length);
+async function handleXP(message) {
+    const hasLeveling = await GuildSchema.findOne({
+        guild: message.guildId,
+        leveling: "enabled"
+    });
 
-            message.delete()
+    if (!hasLeveling) {
+        return;
+    }
 
-            message.channel.send(messageContent);
-        }
-    } else return;
-});
+    if (XPCooldown.includes(message.author.id)) {
+        return;
+    }
+
+    let levelData = await LevelsSchema.findOne({
+        guild: message.guildId,
+        user: message.author.id
+    });
+
+    if (!levelData) {
+        levelData = new LevelsSchema({
+            guild: message.guildId,
+            user: message.author.id,
+            level: 0,
+            xp: 0,
+            totalXp: 0
+        });
+        await levelData.save();
+    }
+
+    const xpGain = 1;
+    const newXp = levelData.xp + xpGain;
+    const newTotalXp = levelData.totalXp + xpGain;
+
+    const updateResult = await LevelsSchema.updateOne(
+        { guild: message.guildId, user: message.author.id },
+        { xp: newXp, totalXp: newTotalXp }
+    );
+
+    const getRequiredXP = (level) => {
+        if (level === 0) return 10;
+        return Math.floor(10 * Math.pow(1.15, level - 1));
+    };
+
+    const requiredXP = getRequiredXP(levelData.level);
+
+    if (newXp >= requiredXP) {
+        const newLevel = levelData.level + 1;
+        levelData.xp = 0;
+
+        await LevelsSchema.updateOne(
+            { guild: message.guildId, user: message.author.id },
+            { level: newLevel, xp: levelData.xp }
+        );
+
+        let embed = new EmbedBuilder()
+            .setTitle(`${message.author.username} Leveled up!`)
+            .setDescription(`**Level** ${levelData.level} -> ${newLevel}\n**Total XP:** ${newTotalXp}`)
+            .setFooter({ text: 'Level Up' })
+            .setTimestamp()
+            .setColor('White');
+
+        message.channel.send({
+            embeds: [embed]
+        });
+    }
+
+    XPCooldown.push(message.author.id);
+    setTimeout(() => {
+        XPCooldown.shift();
+    }, 30 * 1000);
+}
 
 client.on('messageDelete', async (message) => {
     let data = await GuildSchema.findOne({ guild: message.guildId });

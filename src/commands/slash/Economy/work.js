@@ -16,7 +16,7 @@ module.exports = {
     run: async (client, interaction, args) => {
         let economy = await EconomySchema.findOne({
             guild: interaction.guildId,
-            user: interaction.member.user.username
+            user: interaction.member.user.id
         })
 
         if (cooldown.includes(interaction.member.user.id)) {
@@ -80,7 +80,7 @@ module.exports = {
                 await EconomySchema.findOneAndUpdate(
                     {
                         guild: interaction.guildId,
-                        user: interaction.member.user.username
+                        user: interaction.member.user.id
                     },
                     {
                         balance: updatedBalance
