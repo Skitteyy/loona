@@ -29,7 +29,7 @@ module.exports = {
 
         let economy = await EconomySchema.findOne({
             guild: interaction.guildId,
-            user: interaction.member.user.username
+            user: interaction.member.user.id
         })
 
         if (!economy) {
@@ -79,7 +79,7 @@ module.exports = {
 
                 await EconomySchema.find({
                     guild: interaction.guildId,
-                    user: interaction.member.user.username
+                    user: interaction.member.user.id
                 }).updateOne({
                     balance: balance + amount
                 })
@@ -99,7 +99,7 @@ module.exports = {
 
                 await EconomySchema.find({
                     guild: interaction.guildId,
-                    user: interaction.member.user.username
+                    user: interaction.member.user.id
                 }).updateOne({
                     balance: balance - amount
                 })
@@ -121,7 +121,7 @@ module.exports = {
 
                 await EconomySchema.find({
                     guild: interaction.guildId,
-                    user: interaction.member.user.username
+                    user: interaction.member.user.id
                 }).updateOne({
                     balance: balance - amount
                 })
@@ -141,7 +141,7 @@ module.exports = {
 
                 await EconomySchema.find({
                     guild: interaction.guildId,
-                    user: interaction.member.user.username
+                    user: interaction.member.user.id
                 }).updateOne({
                     balance: balance + amount
                 })

@@ -21,7 +21,8 @@ module.exports = {
      */
     run: async (client, interaction, args) => {
         const Moonshard = client.emojis.cache.find(emoji => emoji.id === '1157656742990204998')
-        const user = interaction.options.getUser('user').username;
+        const user = interaction.options.getUser('user').id;
+        const username = interaction.options.getUser('user').username;
         const amount = interaction.options.getNumber('amount');
 
         let economy = await EconomySchema.findOne({
@@ -53,8 +54,8 @@ module.exports = {
             })
 
             let embed = new EmbedBuilder()
-                .setTitle(`Set ${user}'s Moonshard!`)
-                .setDescription(`Successfully set ${user}'s Moonshard ${Moonshard} to ${amount}!`)
+                .setTitle(`Set ${username}'s Moonshard!`)
+                .setDescription(`Successfully set ${username}'s Moonshard ${Moonshard} to ${amount}!`)
                 .setFooter({ text: 'Set Balance' })
                 .setColor('White')
 

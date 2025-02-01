@@ -25,7 +25,7 @@ module.exports = {
 
         let economy = await EconomySchema.findOne({
             guild: interaction.guildId,
-            user: interaction.member.user.username
+            user: interaction.member.user.id
         })
 
         if (!economy) {
@@ -83,7 +83,7 @@ module.exports = {
                 const updatedBalance = balance + randomAmount;
                 await EconomySchema.find({
                     guild: interaction.guildId,
-                    user: interaction.member.user.username
+                    user: interaction.member.user.id
                 }).updateOne({
                     balance: updatedBalance
                 })
@@ -93,7 +93,7 @@ module.exports = {
                 if (getApple) {
                     await EconomySchema.find({
                         guild: interaction.guildId,
-                        user: interaction.member.user.username
+                        user: interaction.member.user.id
                     }).updateOne({
                         $push: { items: 'apple' }
                     })

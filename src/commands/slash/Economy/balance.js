@@ -17,7 +17,8 @@ module.exports = {
      */
     run: async (client, interaction, args) => {
         const Moonshard = client.emojis.cache.find(emoji => emoji.id === '1157656742990204998')
-        const user = interaction.options.getUser('user').username;
+        const user = interaction.options.getUser('user').id;
+        const username = interaction.options.getUser('user').username;
 
         let economy = await EconomySchema.findOne({
             guild: interaction.guildId,
@@ -33,8 +34,8 @@ module.exports = {
 
         if (!economy.balance) {
             let embed = new EmbedBuilder()
-                .setTitle(`${user}'s Balance`)
-                .setDescription(`${user} doesn't have any Moonshard ${Moonshard}!`)
+                .setTitle(`${username}'s Balance`)
+                .setDescription(`${username} doesn't have any Moonshard ${Moonshard}!`)
                 .setFooter({ text: 'Balance' })
                 .setColor('White')
 
@@ -43,8 +44,8 @@ module.exports = {
             })
         } else {
             let embed = new EmbedBuilder()
-                .setTitle(`${user}'s Balance`)
-                .setDescription(`${user} has ${economy.balance} Moonshard ${Moonshard}!`)
+                .setTitle(`${username}'s Balance`)
+                .setDescription(`${username} has ${economy.balance} Moonshard ${Moonshard}!`)
                 .setFooter({ text: 'Balance' })
                 .setColor('White')
 

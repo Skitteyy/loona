@@ -21,7 +21,8 @@ module.exports = {
      */
     run: async (client, interaction, args) => {
         const Moonshard = client.emojis.cache.find(emoji => emoji.id === '1157656742990204998')
-        const user = interaction.options.getUser('user').username;
+        const user = interaction.options.getUser('user').id;
+        const username = interaction.options.getUser('user').username;
         const amount = interaction.options.getNumber('amount');
 
         let economy = await EconomySchema.findOne({
@@ -42,7 +43,7 @@ module.exports = {
 
             if (balance - amount < 0) {
                 interaction.reply({
-                    content: `${user} doesn\'t have this much Moonshard ${Moonshard}!`
+                    content: `${username} doesn\'t have this much Moonshard ${Moonshard}!`
                 })
                 return
             }
@@ -62,8 +63,8 @@ module.exports = {
             })
 
             let embed = new EmbedBuilder()
-                .setTitle(`Removed Moonshard from ${user}!`)
-                .setDescription(`Successfully removed ${amount} Moonshard ${Moonshard} from ${user}!`)
+                .setTitle(`Removed Moonshard from ${username}!`)
+                .setDescription(`Successfully removed ${amount} Moonshard ${Moonshard} from ${username}!`)
                 .setFooter({ text: 'Remove Balance' })
                 .setColor('White')
 

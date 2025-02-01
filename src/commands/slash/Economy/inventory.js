@@ -18,7 +18,7 @@ module.exports = {
 
         let economy = await EconomySchema.findOne({
             guild: interaction.guildId,
-            user: interaction.member.user.username
+            user: interaction.member.user.id
         });
 
         if (!economy || !economy.items || economy.items.length === 0) {

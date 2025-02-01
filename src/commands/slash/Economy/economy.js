@@ -23,7 +23,7 @@ module.exports = {
     run: async (client, interaction, args) => {
         let economy = await EconomySchema.findOne({
             guild: interaction.guildId,
-            user: interaction.member.user.username
+            user: interaction.member.user.id
         })
 
         switch (interaction.options.getString('action')) {
@@ -36,7 +36,7 @@ module.exports = {
                 } else {
                     economy = await new EconomySchema({
                         guild: interaction.guildId,
-                        user: interaction.member.user.username,
+                        user: interaction.member.user.id,
                         job: 'unemployed'
                     }).save()
 
@@ -89,7 +89,7 @@ module.exports = {
                         if (interaction.values[0] === 'confirm') {
                             await EconomySchema.findOneAndDelete({
                                 guild: interaction.guildId,
-                                user: interaction.member.user.username
+                                user: interaction.member.user.id
                             })
 
                             await interaction.reply({

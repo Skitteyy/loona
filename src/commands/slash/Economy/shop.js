@@ -25,7 +25,7 @@ module.exports = {
 
         let economy = await EconomySchema.findOne({
             guild: interaction.guildId,
-            user: interaction.member.user.username
+            user: interaction.member.user.id
         })
 
         switch (interaction.options.getString('action')) {
@@ -154,7 +154,7 @@ module.exports = {
                         await EconomySchema.findOneAndUpdate(
                             {
                                 guild: interaction.guildId,
-                                user: interaction.member.user.username,
+                                user: interaction.member.user.id,
                                 job: economy.job
                             },
                             {
@@ -167,7 +167,7 @@ module.exports = {
 
                         const embed2 = new EmbedBuilder()
                             .setTitle(`Success!`)
-                            .setDescription(`You successfully bought a ${buyItem} for 300 Moonshard ${Moonshard}!`)
+                            .setDescription(`You successfully bought ${buyItem} for 300 Moonshard ${Moonshard}!`)
                             .setFooter({ text: 'Shop buy' })
                             .setColor('White');
 
