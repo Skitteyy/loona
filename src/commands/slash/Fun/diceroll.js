@@ -20,12 +20,12 @@ module.exports = {
             );
 
         let options = [
-            `${message.author.username} rolled a dice, it landed on 1!`,
-            `${message.author.username} rolled a dice, it landed on 2!`,
-            `${message.author.username} rolled a dice, it landed on 3!`,
-            `${message.author.username} rolled a dice, it landed on 4!`,
-            `${message.author.username} rolled a dice, it landed on 5!`,
-            `${message.author.username} rolled a dice, it landed on 6!`,
+            `${interaction.member.user.username} rolled a dice, it landed on 1!`,
+            `${interaction.member.user.username} rolled a dice, it landed on 2!`,
+            `${interaction.member.user.username} rolled a dice, it landed on 3!`,
+            `${interaction.member.user.username} rolled a dice, it landed on 4!`,
+            `${interaction.member.user.username} rolled a dice, it landed on 5!`,
+            `${interaction.member.user.username} rolled a dice, it landed on 6!`,
         ]
 
         let answer = options[Math.floor(Math.random() * options.length)];
@@ -41,7 +41,7 @@ module.exports = {
             components: [row]
         });
 
-        const filter = i => i.customId === 'coinflip_button' && i.user.id === interaction.user.id;
+        const filter = i => i.customId === 'diceroll_button' && i.user.id === interaction.user.id;
 
         const collector = interaction.channel.createMessageComponentCollector({ filter: filter, time: 30000 });
 
