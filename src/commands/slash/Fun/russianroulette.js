@@ -41,7 +41,7 @@ module.exports = {
             components: [row]
         });
 
-        const filter = i => i.customId === 'coinflip_button' && i.user.id === interaction.user.id;
+        const filter = i => i.customId === 'russianroulette_button' && i.user.id === interaction.user.id;
 
         const collector = interaction.channel.createMessageComponentCollector({ filter: filter, time: 30000 });
 
